@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, EmailStr, List
-from typing import Literal
+from pydantic import BaseModel, Field, EmailStr
+from typing import Literal, List
 from datetime import datetime
 from enums import ArticleStatusEnum 
 

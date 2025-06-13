@@ -47,3 +47,7 @@ class BaseLike(BaseModel):
     id: int = Field(example=1)
     updated_at: datetime = Field(example = "2025-06-01 15:30:00")
     created_at:datetime = Field(example = "2025-06-01 15:30:00")
+
+class LoginUser(BaseModel):
+    email:str=Field(example='example@mail.ru',min_length=3,max_length=60)
+    password:str=Field(example='qwerty123',min_length=8,max_length=60)

@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     DB_HOST: str = "localhost"
     DB_PORT: int = 3306
     MYSQL_ROOT_PASSWORD: str = "root"
-    
+    SECRET:str
     model_config=SettingsConfigDict(env_file=".env")
 
 settings= Settings()
