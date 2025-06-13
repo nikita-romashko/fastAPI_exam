@@ -30,13 +30,22 @@ with Session(bind=engine) as session:
     user2 = m.User(
         name="Мария",
         last_name="Петрова",
-        patronymic=None,
+        patronymic="Петровна",
         email="maria@example.com",
         password_hash=pwd_context.hash("supersecret123"),
         role_id=role_reader.id,
         phone="+79123456702"
     )
-    session.add_all([user1, user2])
+    user3 = m.User(
+        name="Игорь",
+        last_name="Петров",
+        patronymic="Иванович",
+        email="igori@example.com",
+        password_hash=pwd_context.hash("supersecret123"),
+        role_id=role_admin.id,
+        phone="+79124456702"
+    )
+    session.add_all([user1, user2, user3])
     session.commit()
 
 
