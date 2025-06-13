@@ -59,6 +59,8 @@ def create_article(
     db: Session = Depends(get_db),
     current_user: m.User = Depends(auth_handler.get_current_user)
 ):
+    if current_user.role.name not in ("Автор", "Модератор"):
+        raise HTTPException(status_code=403, detail="Только авторы или модераторы могут создавать статьи")
     db_article = m.Article(
         title=article.title,
         content=article.content,
