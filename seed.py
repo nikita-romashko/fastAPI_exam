@@ -11,7 +11,7 @@ m.Base.metadata.drop_all(bind=engine)
 m.Base.metadata.create_all(bind=engine)
 
 with Session(bind=engine) as session:
-    # Роли
+
     role_admin = m.Role(name="Модератор", description=" управление всеми статьями и комментариями")
     role_author = m.Role(name="Автор", description="создание/редактирование своих статей")
     role_reader = m.Role(name="Читатель", description="чтение статей, комментарии")

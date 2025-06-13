@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query, status
 from database import get_db
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 import models as m
 from typing import List, Optional
 import pyd
@@ -16,10 +17,28 @@ def get_articles(
     limit: int = Query(10, ge=1),
     category: Optional[str] = Query(None),
     status: Optional[ArticleStatusEnum] = Query(None),
+    sort_by_popularity: bool = Query(False),
     current_user: Optional[m.User] = Depends(auth_handler.get_optional_user)
 ):
     skip = (page - 1) * limit
-    query = db.query(m.Article)
+    likes_count_subquery = (
+        db.query(
+            m.Like.article_id,
+            func.count(m.Like.id).label('likes_count')
+        )
+        .group_by(m.Like.article_id)
+        .subquery()
+    )
+    query = (
+        db.query(
+            m.Article,
+            func.coalesce(likes_count_subquery.c.likes_count, 0).label('likes_count')
+        )
+        .outerjoin(
+            likes_count_subquery,
+            m.Article.id == likes_count_subquery.c.article_id
+        )
+    )
 
     if status == ArticleStatusEnum.DRAFT:
         if current_user is None:
@@ -35,7 +54,16 @@ def get_articles(
     if category:
         query = query.join(m.Article.categories).filter(m.Category.name == category)
 
-    articles = query.offset(skip).limit(limit).all()
+    if sort_by_popularity:
+        query = query.outerjoin(m.Like).group_by(m.Article.id).order_by(func.count(m.Like.id).desc())
+    else:
+        query = query.order_by(m.Article.published_at.desc())
+
+    results = query.offset(skip).limit(limit).all()
+    articles = []
+    for article, likes_count in results:
+        article.likes_count = likes_count
+        articles.append(article)
     return articles
 
 @article_router.get("/{article_id}", response_model=pyd.SchemaArticle)
