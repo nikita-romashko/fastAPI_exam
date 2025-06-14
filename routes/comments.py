@@ -41,6 +41,9 @@ def create_comment(
     db: Session = Depends(get_db),
     current_user: m.User = Depends(auth_handler.get_current_user),
 ):
+    article = db.query(m.Article).filter_by(id=comment.article_id).first()
+    if not article:
+        raise HTTPException(status_code=404, detail="Статья не найдена")
     db_comment = m.Comment(
         article_id=comment.article_id,
         user_id=current_user.id,
@@ -54,7 +57,7 @@ def create_comment(
 @comment_router.put("/{comment_id}", response_model=pyd.SchemaComment)
 def update_comment(
     comment_id: int,
-    comment_data: pyd.CreateComment,
+    comment_data: pyd.UpdateComment,
     db: Session = Depends(get_db),
     current_user: m.User = Depends(auth_handler.get_current_user),
 ):

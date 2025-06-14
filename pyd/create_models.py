@@ -25,7 +25,8 @@ class CreateArticle(BaseModel):
 class CreateComment(BaseModel):
     article_id:int = Field(...,example=1)
     text:str = Field(...,example="Отличная статья!", min_length=1)
-
+class UpdateComment(BaseModel):
+    text:str = Field(...,example="Отличная статья!", min_length=1)
 
 class CreateCategory(BaseModel):
     name:str = Field(...,example="Наука", min_length=2)
