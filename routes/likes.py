@@ -44,5 +44,8 @@ def get_likes_count(
     article_id: int,
     db: Session = Depends(get_db),
 ):
+    article = db.query(m.Article).get(article_id)
+    if not article:
+        raise HTTPException(status_code=404, detail="Статья не найдена")
     count = db.query(m.Like).filter_by(article_id=article_id).count()
     return {"article_id": article_id, "likes_count": count}
