@@ -51,7 +51,7 @@ class Article(Base):
     title = Column(String(255), nullable=False)
     content = Column(Text)
     status = Column(Enum(ArticleStatusEnum, name='article_status'), default=ArticleStatusEnum.DRAFT, nullable=False)
-    published_at = Column(DateTime(), server_default=func.now())
+    published_at = Column(DateTime(), nullable = True)
     created_at = Column(DateTime(), server_default=func.now())
     updated_at = Column(DateTime(), server_default=func.now(), onupdate=func.now())
 

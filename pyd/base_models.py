@@ -26,7 +26,7 @@ class BaseArticle(BaseModel):
 Заграница — Турция, Грузия и Сербия остаются доступными и интересными направлениями.
 Планируйте заранее, бронируйте жильё и не забывайте про страховку. Хорошего отдыха!""")
     status: ArticleStatusEnum = Field(example=ArticleStatusEnum.DRAFT)
-    published_at: datetime = Field(example = "2025-06-01 15:30:00")
+    published_at: datetime | None = Field(example = "2025-06-01 15:30:00")
     updated_at: datetime = Field(example = "2025-06-01 15:30:00")
     created_at:datetime = Field(example = "2025-06-01 15:30:00")
 

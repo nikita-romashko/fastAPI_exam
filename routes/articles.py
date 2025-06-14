@@ -7,6 +7,8 @@ from typing import List, Optional
 import pyd
 from auth import auth_handler
 from enums import ArticleStatusEnum
+from sqlalchemy import or_, and_
+from datetime import datetime
 
 article_router=APIRouter(prefix="/posts", tags=["posts"])
 
@@ -48,16 +50,25 @@ def get_articles(
         query = query.filter(m.Article.status == ArticleStatusEnum.DRAFT)
 
     else:
-        if current_user is None or current_user.role.name != "Модератор":
+        if current_user is None or current_user.role.name != "Модератор" and current_user.role.name=='Читатель':
             query = query.filter(m.Article.status == ArticleStatusEnum.PUBLISHED)
+        elif current_user.role.name=='Автор':
+            query = query.filter(
+            or_(
+                m.Article.status == ArticleStatusEnum.PUBLISHED,
+                and_(
+                    m.Article.status == ArticleStatusEnum.DRAFT,
+                    m.Article.author_id == current_user.id
+                )
+            )
+        )
 
     if category:
         query = query.join(m.Article.categories).filter(m.Category.name == category)
 
     if sort_by_popularity:
         query = query.outerjoin(m.Like).group_by(m.Article.id).order_by(func.count(m.Like.id).desc())
-    else:
-        query = query.order_by(m.Article.published_at.desc())
+
 
     results = query.offset(skip).limit(limit).all()
     articles = []
@@ -95,8 +106,13 @@ def create_article(
         status=article.status,
         author_id=current_user.id
     )
+    if article.status == ArticleStatusEnum.PUBLISHED.value:
+        db_article.published_at = datetime.now()
     if article.category_ids:
-        db_article.categories = db.query(m.Category).filter(m.Category.id.in_(article.category_ids)).all()
+        categories = db.query(m.Category).filter(m.Category.id.in_(article.category_ids)).all()
+        if len(categories) != len(set(article.category_ids)):
+            raise HTTPException(status_code=400, detail="Одна или несколько категорий не найдены")
+        db_article.categories=categories
 
     db.add(db_article)
     db.commit()
@@ -117,6 +133,9 @@ def update_article(
 
     if article.author_id != current_user.id and current_user.role.name != "Модератор":
         raise HTTPException(status_code=403, detail="Нет доступа")
+    
+    if article.status == ArticleStatusEnum.DRAFT and new_data.status == ArticleStatusEnum.PUBLISHED.value:
+            article.published_at = datetime.now()
 
     article.title = new_data.title
     article.content = new_data.content
