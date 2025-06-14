@@ -34,7 +34,6 @@ class User(Base):
     password_hash= Column(String(255),nullable=False)
     role_id = Column(Integer, ForeignKey("roles.id"),nullable=False)
     phone= Column(String(255),nullable=True)
-    refresh_token=Column(String(1024),nullable=True)
     created_at = Column(DateTime(), server_default=func.now())
     updated_at = Column(DateTime(), server_default=func.now(), onupdate=func.now())
 
