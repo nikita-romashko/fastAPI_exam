@@ -1,8 +1,6 @@
 fastapi[standard]==0.115.12
 sqlalchemy==2.0.41
 pydantic-settings==2.9.1
-python-multipart==0.0.20
 mysqlclient==2.2.7
-pillow==11.2.1
 passlib[bcrypt]==1.7.4
 pyjwt==2.10.1
