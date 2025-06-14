@@ -6,7 +6,6 @@ class SchemaUser(BaseUser):
 
 class SchemaLike(BaseLike):
     user: BaseUser
-    article: BaseArticle
 
 class SchemaArticle(BaseArticle):
     author:BaseUser
