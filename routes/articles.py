@@ -127,7 +127,7 @@ def update_article(
     current_user: m.User = Depends(auth_handler.get_current_user)
 ):
     article = db.query(m.Article).get(article_id)
-    print(article.author_id)
+
     if not article:
         raise HTTPException(status_code=404, detail="Статья не найдена")
 
